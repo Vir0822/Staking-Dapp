@@ -8,7 +8,6 @@ import "../src/StakingApp.sol";
 import {IERC20 as IERC20Token} from "../lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
 
 contract StakingAppTest is Test {
-
     StakingToken stakingToken;
     StakingApp stakingApp;
 
@@ -16,17 +15,18 @@ contract StakingAppTest is Test {
     string name_ = "Staking Token";
     string symbol_ = "STK";
 
-    // StakingApp Parameters 
-    address owner_ = vm.addr(1); 
-    uint256 stakingPeriod_ = 10000000000000; 
+    // StakingApp Parameters
+    address owner_ = vm.addr(1);
+    uint256 stakingPeriod_ = 10000000000000;
     uint256 fixedStakingAmount_ = 10;
     uint256 rewardPerPeriod_ = 1 ether;
 
     address randomUser = vm.addr(2);
 
     function setUp() external {
-        stakingToken = new StakingToken(name_, symbol_); 
-        stakingApp = new StakingApp(address(stakingToken), owner_, stakingPeriod_, fixedStakingAmount_, rewardPerPeriod_);
+        stakingToken = new StakingToken(name_, symbol_);
+        stakingApp =
+            new StakingApp(address(stakingToken), owner_, stakingPeriod_, fixedStakingAmount_, rewardPerPeriod_);
     }
 
     function testStakingTokenCorrectlyDeployed() external view {
@@ -52,7 +52,6 @@ contract StakingAppTest is Test {
         stakingApp.changeStakingPeriod(newStakingPeriod_);
         uint256 stakingPeriodAfter = stakingApp.stakingPeriod();
 
-
         assert(stakingPeriodBefore != newStakingPeriod_);
         assert(stakingPeriodAfter == newStakingPeriod_);
 
@@ -63,10 +62,9 @@ contract StakingAppTest is Test {
         vm.startPrank(owner_);
         vm.deal(owner_, 1 ether);
 
-
         uint256 etherValue = 1 ether;
         uint256 balanceBefore = address(stakingApp).balance;
-        (bool success, ) = address(stakingApp).call{value: etherValue}("");
+        (bool success,) = address(stakingApp).call{value: etherValue}("");
         uint256 balanceAfter = address(stakingApp).balance;
         require(success, "Transfer Failed");
 
@@ -80,7 +78,7 @@ contract StakingAppTest is Test {
         vm.startPrank(randomUser);
 
         uint256 depositAmount = 1;
-        vm.expectRevert("Incorrect Amount");
+        vm.expectRevert("Incorrect amount");
         stakingApp.depositTokens(depositAmount);
 
         vm.stopPrank();
@@ -99,7 +97,7 @@ contract StakingAppTest is Test {
         uint256 userBalanceAfter = stakingApp.userBalance(randomUser);
         uint256 elapsePeriodAfter = stakingApp.elapsePeriod(randomUser);
 
-        assert(userBalanceAfter- userBalanceBefore == tokenAmount);
+        assert(userBalanceAfter - userBalanceBefore == tokenAmount);
         assert(elapsePeriodBefore == 0);
         assert(elapsePeriodAfter == block.timestamp);
 
@@ -119,7 +117,7 @@ contract StakingAppTest is Test {
         uint256 userBalanceAfter = stakingApp.userBalance(randomUser);
         uint256 elapsePeriodAfter = stakingApp.elapsePeriod(randomUser);
 
-        assert(userBalanceAfter- userBalanceBefore == tokenAmount);
+        assert(userBalanceAfter - userBalanceBefore == tokenAmount);
         assert(elapsePeriodBefore == 0);
         assert(elapsePeriodAfter == block.timestamp);
 
@@ -143,7 +141,7 @@ contract StakingAppTest is Test {
 
         vm.stopPrank();
     }
-    
+
     function testWithdrawTokensCorrectly() external {
         vm.startPrank(randomUser);
 
@@ -157,7 +155,7 @@ contract StakingAppTest is Test {
         uint256 userBalanceAfter = stakingApp.userBalance(randomUser);
         uint256 elapsePeriodAfter = stakingApp.elapsePeriod(randomUser);
 
-        assert(userBalanceAfter- userBalanceBefore == tokenAmount);
+        assert(userBalanceAfter - userBalanceBefore == tokenAmount);
         assert(elapsePeriodBefore == 0);
         assert(elapsePeriodAfter == block.timestamp);
 
@@ -169,7 +167,6 @@ contract StakingAppTest is Test {
         assert(userBalanceAfter2 == userBalanceBefore2 + userBalanceInMapping);
 
         vm.stopPrank();
-
     }
 
     // ClaimRewards Function Tests
@@ -195,19 +192,17 @@ contract StakingAppTest is Test {
         uint256 userBalanceAfter = stakingApp.userBalance(randomUser);
         uint256 elapsePeriodAfter = stakingApp.elapsePeriod(randomUser);
 
-        assert(userBalanceAfter- userBalanceBefore == tokenAmount);
+        assert(userBalanceAfter - userBalanceBefore == tokenAmount);
         assert(elapsePeriodBefore == 0);
         assert(elapsePeriodAfter == block.timestamp);
-
 
         vm.expectRevert("Need to wait");
         stakingApp.claimRewards();
 
-
         vm.stopPrank();
     }
 
-     function testShouldRevertIfNoEther() external {
+    function testShouldRevertIfNoEther() external {
         vm.startPrank(randomUser);
 
         uint256 tokenAmount = stakingApp.fixedStakingAmount();
@@ -220,20 +215,18 @@ contract StakingAppTest is Test {
         uint256 userBalanceAfter = stakingApp.userBalance(randomUser);
         uint256 elapsePeriodAfter = stakingApp.elapsePeriod(randomUser);
 
-        assert(userBalanceAfter- userBalanceBefore == tokenAmount);
+        assert(userBalanceAfter - userBalanceBefore == tokenAmount);
         assert(elapsePeriodBefore == 0);
         assert(elapsePeriodAfter == block.timestamp);
-
 
         vm.warp(block.timestamp + stakingPeriod_);
         vm.expectRevert("Transfer failed");
         stakingApp.claimRewards();
 
-
         vm.stopPrank();
     }
 
-     function testCanClaimRewardsCorrectly() external {
+    function testCanClaimRewardsCorrectly() external {
         vm.startPrank(randomUser);
 
         uint256 tokenAmount = stakingApp.fixedStakingAmount();
@@ -246,18 +239,17 @@ contract StakingAppTest is Test {
         uint256 userBalanceAfter = stakingApp.userBalance(randomUser);
         uint256 elapsePeriodAfter = stakingApp.elapsePeriod(randomUser);
 
-        assert(userBalanceAfter- userBalanceBefore == tokenAmount);
+        assert(userBalanceAfter - userBalanceBefore == tokenAmount);
         assert(elapsePeriodBefore == 0);
         assert(elapsePeriodAfter == block.timestamp);
         vm.stopPrank();
 
         vm.startPrank(owner_);
-        uint256 etherAmount = 10000 ether; 
+        uint256 etherAmount = 10000 ether;
         vm.deal(owner_, etherAmount);
-        (bool success, ) = address(stakingApp).call{value: etherAmount}("");
+        (bool success,) = address(stakingApp).call{value: etherAmount}("");
         require(success, "Test transfer failed");
         vm.stopPrank();
-
 
         vm.startPrank(randomUser);
         vm.warp(block.timestamp + stakingPeriod_);
@@ -270,7 +262,4 @@ contract StakingAppTest is Test {
         assert(elapsePeriod == block.timestamp);
         vm.stopPrank();
     }
-
-
-
 }
