@@ -85,3 +85,9 @@ forge fmt
 ## Disclaimer
 
 This is an educational and experimental project. The contracts have not been professionally audited and should not be used with real funds without a thorough security review.
+
+### Author
+
+[Virginia Villela](https://github.com/Vir0822)
+
+**Blockchain Developer**
